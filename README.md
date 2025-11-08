@@ -1,4 +1,4 @@
-This project implements and compares three RL approaches for multi-hop circuit selection in the Tor Onion network: tabular Q-Learning, DQN with linear approximation, and A2C with linear approximation. 
+This project implements and compares three RL approaches for Tor multi-hop circuit selection: tabular Q-Learning (baseline), DQN with linear approximation, and A2C with linear approximation. The comparison demonstrates tradeoffs between performance optimization and anonymity-preserving circuit diversity.
 
 Tor Project:
 - https://www.torproject.org
@@ -8,5 +8,3 @@ Dependencies:
 - numpy 
 - gymnasium 
 - torch
-- matplotlib
-- networkx
