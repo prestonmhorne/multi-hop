@@ -27,39 +27,6 @@ class CircuitEnv(gym.Env):
         self.middle_relay = None
         self.exit_relay = None
         self.circuit_pos = 0
-
-    def _generate_relays(self):
-        num_guards = int(self.num_relays * config.GUARD_FRACTION)
-        num_exits = int(self.num_relays * config.EXIT_FRACTION)
-
-        guard_indices = set(np.random.choice(
-            self.num_relays, 
-            num_guards,
-            replace=False
-        ))
-        
-        exit_indices = set(np.random.choice(
-            self.num_relays,
-            num_exits,
-            replace=False
-        ))
-
-        relays = []
-
-        for i in range(self.num_relays):
-            relay = {
-                'id': i,
-                'bandwidth': np.random.uniform(config.MIN_BANDWIDTH, config.MAX_BANDWIDTH),
-                'latency': np.random.uniform(config.MIN_LATENCY, config.MAX_LATENCY),
-                'guard_flag': i in guard_indices,
-                'exit_flag': i in exit_indices,
-            }
-            relays.append(relay)
-
-        if config.VERBOSE:
-            print(f"Guards: {num_guards}, Exits: {num_exits}")
-
-        return relays
     
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
@@ -73,16 +40,6 @@ class CircuitEnv(gym.Env):
         info = {}
 
         return obs, info
-
-    def _get_observation(self):
-        obs = np.zeros(self.num_relays + 1, dtype=np.float32)
-
-        obs[0] = self.circuit_pos / 2.0
-
-        for i in range(self.num_relays):
-            obs[i + 1] = self.relays[i]['bandwidth'] / config.MAX_BANDWIDTH
-
-        return obs
 
     def step(self, action):
         
@@ -125,19 +82,59 @@ class CircuitEnv(gym.Env):
 
         return obs, reward, terminated, truncated, info
 
+    def _generate_relays(self):
+        num_guards = int(self.num_relays * config.GUARD_FRACTION)
+        num_exits = int(self.num_relays * config.EXIT_FRACTION)
+
+        guard_indices = set(np.random.choice(
+            self.num_relays, 
+            num_guards,
+            replace=False
+        ))
+        
+        exit_indices = set(np.random.choice(
+            self.num_relays,
+            num_exits,
+            replace=False
+        ))
+
+        relays = []
+
+        for i in range(self.num_relays):
+            relay = {
+                'id': i,
+                'bandwidth': np.random.uniform(config.MIN_BANDWIDTH, config.MAX_BANDWIDTH),
+                'latency': np.random.uniform(config.MIN_LATENCY, config.MAX_LATENCY),
+                'guard_flag': i in guard_indices,
+                'exit_flag': i in exit_indices,
+            }
+            relays.append(relay)
+
+        if config.VERBOSE:
+            print(f"Guards: {num_guards}, Exits: {num_exits}")
+
+        return relays
+    
+    def _get_observation(self):
+        obs = np.zeros(self.num_relays + 1, dtype=np.float32)
+
+        obs[0] = self.circuit_pos / 2.0
+
+        for i in range(self.num_relays):
+            obs[i + 1] = self.relays[i]['bandwidth'] / config.MAX_BANDWIDTH
+
+        return obs
+    
     def _calculate_reward(self):
 
-        entry = self.relays[self.entry_guard]
-        middle = self.relays[self.middle_relay]
-        exit_r = self.relays[self.exit_relay]
+        entry_guard = self.relays[self.entry_guard]
+        middle_relay = self.relays[self.middle_relay]
+        exit_relay = self.relays[self.exit_relay]
 
-        circuit_bandwidth = min(entry['bandwidth'], middle['bandwidth'], exit_r['bandwidth'])
+        circuit_bandwidth = min(entry_guard['bandwidth'], middle_relay['bandwidth'], exit_relay['bandwidth'])
         bandwidth_reward = (circuit_bandwidth / config.MAX_BANDWIDTH) * config.REWARD_BANDWIDTH_WEIGHT
 
-        circuit_latency = entry['latency'] + middle['latency'] + exit_r['latency']
+        circuit_latency = entry_guard['latency'] + middle_relay['latency'] + exit_relay['latency']
         latency_penalty = (circuit_latency / (config.MAX_LATENCY * 3)) * config.REWARD_LATENCY_WEIGHT
 
         return bandwidth_reward + latency_penalty
-        
-
-        
