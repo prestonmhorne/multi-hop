@@ -81,7 +81,7 @@ def main():
         print(f"Total Latency: {circuit_latency:.2f} ms")
         print(f"Final Reward: {episode_reward:.2f}")
     else:
-        print("\nLast episode failed")
+        print("\nCircuit creation failed")
 
 
 
