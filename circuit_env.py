@@ -121,8 +121,7 @@ class CircuitEnv(gym.Env):
             }
             relays.append(relay)
 
-        if config.VERBOSE:
-            print(f"Guards: {num_guards}, Exits: {num_exits}")
+        print(f"Guards: {num_guards}, Exits: {num_exits}")
 
         return relays
     
