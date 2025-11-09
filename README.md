@@ -1,4 +1,5 @@
-This project implements and compares three RL approaches for Tor multi-hop circuit selection: tabular Q-Learning (baseline), DQN with linear approximation, and A2C with linear approximation. The comparison demonstrates tradeoffs between performance optimization and anonymity-preserving circuit diversity.
+Deep Q-Network (DQN) implementation for Tor circuit selection in a simplified environment. Compares RL-based relay selection against a model of the current bandwidth-weighted implementation to optimize circuit performance.  
+
 
 Tor Project:
 - https://www.torproject.org
@@ -8,4 +9,3 @@ Dependencies:
 - numpy 
 - gymnasium 
 - torch
-

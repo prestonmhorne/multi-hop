@@ -4,7 +4,6 @@ import config
 from gymnasium import spaces
 import gymnasium as gym
 import numpy as np
-import random
 
 class CircuitEnv(gym.Env): 
 
@@ -32,9 +31,24 @@ class CircuitEnv(gym.Env):
 
     def _select_persistent_guard(self):
         guards = [i for i in range(self.num_relays) if self.relays[i]['guard_flag']]
-        bandwidths = [self.relays[i]['bandwidth']for i in guards]
-        return random.choices(guards, weights=bandwidths)[0]
+        bandwidths = np.array([self.relays[i]['bandwidth'] for i in guards])
+        return np.random.choice(guards, p=bandwidths/bandwidths.sum())
     
+    def get_action_mask(self):
+        mask = np.ones(self.num_relays, dtype=bool)
+
+        if self.circuit_pos == 0:
+            mask[self.entry_guard] = False
+        
+        elif self.circuit_pos == 1:
+            mask[self.entry_guard] = False
+            mask[self.middle_relay] = False
+
+            for i in range(self.num_relays):
+                if not self.relays[i]['exit_flag']:
+                    mask[i] = False
+        return mask 
+
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
 
